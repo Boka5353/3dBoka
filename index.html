@@ -5,304 +5,610 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blue Kiwi - Sklep</title>
     <style>
-        :root { --primary: #2b9ee3; --dark: #1e2d42; --light-bg: #f8fafc; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #ffffff; margin: 0; padding: 0; color: var(--dark); padding-bottom: 60px; }
-        .promo-bar { background-color: var(--primary); color: white; text-align: center; padding: 10px; font-size: 14px; font-weight: 500; }
+        :root { 
+            --primary: #2563eb; 
+            --dark: #1e2d42; 
+            --light-bg: #f8fafc; 
+            --border: #e2e8f0;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f1f5f9; margin: 0; padding: 0; color: var(--dark); padding-bottom: 60px; }
+        .promo-bar { background-color: #2b9ee3; color: white; text-align: center; padding: 10px; font-size: 14px; font-weight: 500; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; position: relative; }
-        .logo-box { border: 2px solid #000; padding: 5px 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; text-align: center; }
+        .header { background: #fff; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+        .logo-box { border: 2px solid #000; padding: 5px 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
         .header-icons { display: flex; gap: 15px; align-items: center; font-size: 15px; font-weight: bold; }
         .cart-icon-wrap { position: relative; }
-        .cart-badge { position: absolute; top: -10px; right: -10px; background: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
-        .menu-btn { font-size: 20px; cursor: pointer; user-select: none; }
+        .cart-badge { position: absolute; top: -10px; right: -10px; background: #2b9ee3; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
 
-        /* Menu Boczne */
-        .sidebar-menu { position: fixed; top: 0; right: -10px; width: 280px; height: 100%; background: #1a1c23; color: white; z-index: 1000; box-shadow: -5px 0 15px rgba(0,0,0,0.5); transform: translateX(100%); transition: transform 0.3s ease; padding: 20px; box-sizing: border-box; }
-        .sidebar-menu.active { transform: translateX(0); }
-        .sidebar-close { text-align: right; font-size: 24px; cursor: pointer; margin-bottom: 20px; }
-        .user-profile-icon { font-size: 45px; color: var(--primary); margin-bottom: 25px; }
-        .menu-items { list-style: none; padding: 0; margin: 0; }
-        .menu-items li { font-size: 18px; font-weight: bold; padding: 12px 0; border-bottom: 1px solid #2d313f; cursor: pointer; }
+        .main-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; }
+        @media (max-width: 768px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
 
-        .main-container { max-width: 600px; margin: 0 auto; padding: 15px; }
-        .product-card { text-align: center; margin-bottom: 40px; }
-        .product-card img { max-width: 100%; height: auto; border-radius: 8px; }
-        .product-title { font-size: 28px; font-weight: bold; margin: 15px 0 5px 0; text-align: left; }
-        .product-price { font-size: 22px; color: var(--dark); font-weight: 600; text-align: left; margin-bottom: 15px; }
-        .stock-info { text-align: left; color: #718096; font-size: 14px; margin-bottom: 15px; }
+        .box { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 25px; }
+        h2, h3 { margin-top: 0; font-size: 18px; font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; }
+
+        /* Siatka produktów */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .product-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; background: #fff; }
+        .product-card img { max-width: 100%; height: 130px; object-fit: cover; border-radius: 6px; }
+        .product-title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; text-align: left; }
+        .product-desc { font-size: 12px; color: #64748b; text-align: left; margin-bottom: 8px; min-height: 32px; }
+        .product-price { font-size: 16px; color: var(--dark); font-weight: 600; text-align: left; margin-bottom: 8px; }
         
-        .qty-picker { display: inline-flex; border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden; margin-right: 10px; vertical-align: middle; }
-        .qty-picker button { border: none; background: #fff; width: 35px; height: 40px; font-size: 18px; cursor: pointer; }
-        .qty-picker input { border: none; width: 40px; text-align: center; font-size: 16px; font-weight: bold; outline: none; }
-        .btn-primary { background-color: var(--primary); color: white; border: none; padding: 0 35px; height: 42px; font-size: 15px; font-weight: bold; border-radius: 4px; cursor: pointer; vertical-align: middle; }
+        .qty-picker { display: inline-flex; border: 1px solid #cbd5e1; border-radius: 4px; overflow: hidden; margin-right: 5px; }
+        .qty-picker button { border: none; background: #fff; width: 25px; height: 30px; font-size: 14px; cursor: pointer; }
+        .qty-picker input { border: none; width: 28px; text-align: center; font-size: 13px; font-weight: bold; outline: none; }
+        .btn-add-to-cart { background: #2b9ee3; color: white; border: none; padding: 0 10px; height: 30px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
-        .cart-section { border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-top: 30px; background: #fff; }
-        .cart-section h3 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; }
-        .row-space { display: flex; justify-content: space-between; margin: 12px 0; font-size: 15px; }
-        
-        .shipping-options { margin: 20px 0; border-top: 1px dashed #e2e8f0; padding-top: 15px; }
-        .shipping-option { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; font-size: 14px; cursor: pointer; }
-        .calc-shipping-link { color: #1e2d42; text-decoration: underline; font-size: 14px; font-weight: bold; cursor: pointer; display: inline-block; margin: 10px 0; }
+        /* --- KOSZYK (Jak na Twoim screenie) --- */
+        .checkout-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .checkout-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 15px; }
+        .checkout-item-info { flex-grow: 1; display: flex; flex-direction: column; }
+        .checkout-item-title { font-size: 14px; font-weight: 600; }
+        .checkout-item-qty-control { display: inline-flex; border: 1px solid #cbd5e1; border-radius: 4px; margin-top: 5px; width: fit-content; }
+        .checkout-item-qty-control button { border: none; background: #fff; width: 22px; height: 24px; font-size: 12px; cursor: pointer; }
+        .checkout-item-qty-control input { border: none; width: 24px; text-align: center; font-size: 12px; font-weight: bold; }
+        .checkout-item-price { font-size: 14px; font-weight: bold; }
 
-        /* SEKCJA PŁATNOŚCI */
-        .payment-section { border-top: 1px solid #e2e8f0; margin-top: 20px; padding-top: 20px; }
-        .payment-option { border-bottom: 1px solid #edf2f7; padding: 15px 0; }
-        .payment-header { display: flex; align-items: center; justify-content: space-between; font-weight: 600; cursor: pointer; font-size: 15px; }
-        .payment-header div { display: flex; align-items: center; gap: 10px; }
-        .payment-content { padding: 12px 0 5px 0; display: none; font-size: 13px; color: #4a5568; line-height: 1.5; }
-        .payment-option.active .payment-content { display: block; }
-        
-        .blik-instruction-box { background: #fff9db; border: 1px solid #ffe066; padding: 10px; border-radius: 6px; color: #66a80f; font-weight: 500; margin-top: 5px; }
+        /* Kupon */
+        .coupon-box { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .coupon-box a { color: var(--primary); text-decoration: underline; cursor: pointer; font-weight: bold; }
+        .coupon-input-group { display: none; margin-top: 10px; }
+        .coupon-input-group.active { display: flex; gap: 10px; }
+        .coupon-input-group input { flex-grow: 1; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+        .coupon-input-group button { background: var(--dark); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
 
-        .terms-row { margin: 25px 0 15px 0; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
-        .total-row { font-size: 18px; font-weight: bold; border-top: 1px dashed #e2e8f0; padding-top: 15px; margin-top: 15px; }
-        .btn-order { background-color: #2563eb; color: white; border: none; width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        /* Wysyłka */
+        .shipping-list { margin-top: 15px; }
+        .shipping-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; cursor: pointer; position: relative; }
+        .shipping-row.active { border-color: var(--primary); background: #eff6ff; }
+        .shipping-row input { margin-top: 3px; }
+        .shipping-logo { width: 60px; height: auto; display: block; margin-top: 5px; }
+        .shipping-details { font-size: 13px; line-height: 1.4; }
+        .shipping-price { margin-left: auto; font-weight: bold; font-size: 14px; }
+
+        .paczkomat-select-btn { background: var(--dark); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-top: 5px; display: inline-block; }
+
+        /* Formularz - Dane Rozliczeniowe */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .form-group label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #4a5568; }
+        .form-group label span { color: #ef4444; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; }
+
+        /* Sumy */
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin: 10px 0; }
+        .summary-total { font-size: 18px; font-weight: bold; border-top: 1px dashed var(--border); padding-top: 15px; margin-top: 15px; }
+
+        .btn-order { background-color: var(--primary); color: white; border: none; width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 15px; }
         
-        /* MODALE */
+        /* Modale */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
         .paczkomat-modal { background: white; width: 90%; max-width: 450px; border-radius: 8px; overflow: hidden; }
-        .modal-header { padding: 15px; background: #f8fafc; font-weight: bold; display: flex; justify-content: space-between; }
-        .modal-body { padding: 15px; }
-        
-        /* Styl okienka z instrukcją po zakupie */
-        .success-modal { background: white; width: 90%; max-width: 400px; border-radius: 12px; padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .success-modal h2 { color: #2f9e44; margin-top: 0; }
+        .modal-header { padding: 15px; background: #f8fafc; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .modal-body { padding: 15px; max-height: 300px; overflow-y: auto; }
+        .paczkomat-btn { width: 100%; padding: 12px; margin-bottom: 8px; text-align: left; background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .paczkomat-btn:hover { background: #e2e8f0; }
+
+        .success-modal { background: white; width: 90%; max-width: 400px; border-radius: 12px; padding: 25px; text-align: center; }
         .blik-details { background: #f1f3f5; padding: 15px; border-radius: 8px; text-align: left; margin: 20px 0; font-size: 14px; line-height: 1.6; }
-        .blik-details strong { color: #1e2d42; }
     </style>
 </head>
 <body>
 
-    <div class="promo-bar">Gratis do zamówień powyżej 60 zł</div>
+    <div class="promo-bar">Wysyłka w 24h! Szybkie i bezpieczne zakupy ⚡</div>
 
     <div class="header">
         <div class="logo-box">BLUE KIWI</div>
         <div class="header-icons">
-            <span>🔍</span> <span>🤍</span> <span id="header-price">0,00 zł</span>
+            <span id="header-price">0,00 zł</span>
             <div class="cart-icon-wrap">
                 <span>🛍️</span> <div class="cart-badge" id="cart-count">0</div>
             </div>
-            <div class="menu-btn" onclick="toggleMenu(true)">☰</div>
         </div>
-    </div>
-
-    <!-- Menu Boczne -->
-    <div class="sidebar-menu" id="sideMenu">
-        <div class="sidebar-close" onclick="toggleMenu(false)">✕</div>
-        <div class="user-profile-icon">👤</div>
-        <ul class="menu-items">
-            <li>Zwierzaki</li><li>Smoki</li><li>Szkielety</li><li>Minisy</li><li>Breloczki</li><li>Custom</li><li>Inne</li>
-        </ul>
     </div>
 
     <div class="main-container">
-        <!-- PRODUKT -->
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1611145367651-6303b46e4040?w=500&auto=format&fit=crop" alt="Szop Pracz">
-            <div class="product-title">Szop Pracz</div>
-            <div class="product-price">26,00 zł</div>
-            <div class="stock-info"><span id="stock-count">3</span> w magazynie</div>
-            <div>
-                <div class="qty-picker">
-                    <button onclick="changeQty(-1)">-</button>
-                    <input type="text" id="prod-qty" value="1" readonly>
-                    <button onclick="changeQty(1)">+</button>
+        
+        <!-- LEWA STRONA: PRODUKTY + DANE DO WYSYŁKI -->
+        <div>
+            <!-- PRODUKTY -->
+            <div class="box">
+                <h2 style="border:none; margin-bottom:10px;">Nasze Produkty 💎</h2>
+                <div class="products-grid" id="products-container">
+                    <!-- Dynamiczne produkty -->
                 </div>
-                <button class="btn-primary" onclick="addToCart()">Dodaj do koszyka</button>
+            </div>
+
+            <!-- FORMULARZ DANYCH ROZLICZENIOWYCH -->
+            <div class="box">
+                <h2>Dane rozliczeniowe</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Imię <span>*</span></label>
+                        <input type="text" id="cust-firstname" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nazwisko <span>*</span></label>
+                        <input type="text" id="cust-lastname" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nazwa firmy (opcjonalne)</label>
+                    <input type="text" id="cust-company">
+                </div>
+
+                <div class="form-group">
+                    <label>Kraj / region <span>*</span></label>
+                    <select id="cust-country">
+                        <option value="Polska" selected>Polska</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Ulica <span>*</span></label>
+                    <input type="text" id="cust-street" placeholder="Nazwa ulicy, numer budynku / lokalu" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kod pocztowy <span>*</span></label>
+                        <input type="text" id="cust-zip" placeholder="00-000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Miasto <span>*</span></label>
+                        <input type="text" id="cust-city" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Numer telefonu <span>*</span></label>
+                        <input type="tel" id="cust-phone" placeholder="np. 500600700" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Adres e-mail <span>*</span></label>
+                        <input type="email" id="cust-email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>NIP (opcjonalne)</label>
+                    <input type="text" id="cust-nip">
+                </div>
+
+                <div class="form-group">
+                    <label>Uwagi do zamówienia (opcjonalne)</label>
+                    <textarea id="cust-notes" rows="3" placeholder="Uwagi do zamówienia, np. informacje o dostarczeniu przesyłki."></textarea>
+                </div>
             </div>
         </div>
 
-        <!-- PODSUMOWANIE KOSZYKA -->
-        <div class="cart-section">
-            <h3>Podsumowanie koszyka</h3>
-            <div class="row-space">
-                <span>Kwota:</span> <span id="summary-subtotal">0,00 zł</span>
-            </div>
+        <!-- PRAWA STRONA: KOSZYK + WYSYŁKA + PŁATNOŚĆ -->
+        <div>
+            <div class="box">
+                <h2>Twoje zamówienie</h2>
 
-            <div class="shipping-options">
-                <strong>Przesyłka</strong>
-                <label class="shipping-option">
-                    <input type="radio" name="shipping" value="12.99" checked onclick="calculateTotal()">
-                    <div>InPost Paczkomat 24/7 (dostawa 48h):<br><strong>12,99 zł</strong></div>
-                </label>
-                <label class="shipping-option">
-                    <input type="radio" name="shipping" value="15.76" onclick="calculateTotal()">
-                    <div>InPost Kurier Standard:<br><strong>15,76 zł</strong></div>
-                </label>
-            </div>
-
-            <div class="calc-shipping-link" onclick="openPaczkomatModal()">Oblicz koszty wysyłki</div>
-
-            <!-- SEKCJA PŁATNOŚCI -->
-            <div class="payment-section">
-                <strong>Metoda płatności</strong>
-
-                <!-- NOWY BLIK NA TELEFON -->
-                <div class="payment-option active" id="pay-blik">
-                    <div class="payment-header" onclick="selectPayment('blik')">
-                        <div><input type="radio" name="pay-method" value="BLIK na Telefon" checked> Szybki przelew na telefon BLIK</div>
-                        <span style="background: #000; color: #fff; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px;">blik</span>
+                <!-- KUPON RABATOWY -->
+                <div class="coupon-box">
+                    🔔 Masz kupon? <a onclick="toggleCouponInput()">Kliknij tutaj, aby go użyć</a>
+                    <div class="coupon-input-group" id="coupon-group">
+                        <input type="text" id="coupon-code" placeholder="Wpisz kod (np. KIWI10)">
+                        <button onclick="applyCoupon()">Zastosuj</button>
                     </div>
-                    <div class="payment-content">
-                        <div class="blik-instruction-box">
-                            Po kliknięciu "Kupuję i płacę" wyświetlimy numer telefonu i dane do natychmiastowego przelewu BLIK. Twoje zamówienie zostanie przekazane do realizacji od razu po zaksięgowaniu wpłaty.
+                </div>
+
+                <!-- LISTA PRZEDMIOTÓW -->
+                <div id="checkout-items-list">
+                    <!-- Wpadną wybrane produkty -->
+                </div>
+
+                <!-- OPALTY I WYSYŁKA -->
+                <div class="summary-row" style="margin-top:20px;">
+                    <span>Wartość koszyka:</span>
+                    <strong id="sum-subtotal">0,00 zł</strong>
+                </div>
+
+                <div id="coupon-discount-row" class="summary-row" style="display:none; color:#22c55e;">
+                    <span>Rabat (Kupon):</span>
+                    <strong id="sum-discount">0,00 zł</strong>
+                </div>
+
+                <!-- SEKCJA WYSYŁKI (Z LOGOTYPAMI) -->
+                <h3 style="margin-top:25px; margin-bottom:10px;">Przesyłka</h3>
+                <div class="shipping-list">
+                    
+                    <div class="shipping-row active" onclick="selectShipping('paczkomat', 12.99)">
+                        <input type="radio" name="shipping-method" id="ship-paczkomat" value="12.99" checked>
+                        <div class="shipping-details">
+                            <strong>InPost Paczkomat 24/7 (dostawa 48h):</strong>
+                            <div style="color:#ef4444; font-weight:bold; margin-top:2px;" id="paczkomat-name-display">Wybierz punkt Paczkomat!</div>
+                            <button class="paczkomat-select-btn" onclick="openPaczkomatModal(event)">Wybierz Paczkomat</button>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/InPost_logo.svg" class="shipping-logo" style="width: 50px;">
                         </div>
+                        <div class="shipping-price">12,99 zł</div>
                     </div>
+
+                    <div class="shipping-row" onclick="selectShipping('kurier', 15.76)">
+                        <input type="radio" name="shipping-method" id="ship-kurier" value="15.76">
+                        <div class="shipping-details">
+                            <strong>InPost Kurier Standard (dostawa 48h):</strong>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ec/InPost_logo.svg" class="shipping-logo" style="width: 50px;">
+                        </div>
+                        <div class="shipping-price">15,76 zł</div>
+                    </div>
+
+                    <div class="shipping-row" onclick="selectShipping('orlen', 13.49)">
+                        <input type="radio" name="shipping-method" id="ship-orlen" value="13.49">
+                        <div class="shipping-details">
+                            <strong>Orlen Paczka:</strong>
+                        </div>
+                        <div class="shipping-price">13,49 zł</div>
+                    </div>
+
+                    <div class="shipping-row" onclick="selectShipping('dpd', 13.00)">
+                        <input type="radio" name="shipping-method" id="ship-dpd" value="13.00">
+                        <div class="shipping-details">
+                            <strong>Punkt DPD Pickup:</strong>
+                        </div>
+                        <div class="shipping-price">13,00 zł</div>
+                    </div>
+
                 </div>
 
-                <!-- TRADYCYJNY PRZELEW -->
-                <div class="payment-option" id="pay-online">
-                    <div class="payment-header" onclick="selectPayment('online')">
-                        <div><input type="radio" name="pay-method" value="Przelew tradycyjny"> Przelew tradycyjny</div>
-                        <span style="color: #64748b; font-size: 12px;">🏦 Bank</span>
-                    </div>
-                    <div class="payment-content">
-                        Dane do przelewu ręcznego wyświetlą się po zatwierdzeniu zakupu.
-                    </div>
+                <!-- METODA PŁATNOŚCI -->
+                <h3 style="margin-top:25px;">Metoda płatności</h3>
+                <div style="background:#fff9db; border: 1px solid #ffe066; padding:12px; border-radius:6px; color:#66a80f; font-weight:500; font-size:13px;">
+                    📱 <strong>Przelew na telefon BLIK (0% prowizji)</strong><br>
+                    Dane do przelewu pokażą się natychmiast po kliknięciu zamówienia.
                 </div>
-            </div>
 
-            <div class="terms-row">
-                <input type="checkbox" id="terms-check">
-                <label for="terms-check">Przeczytałem/am i akceptuję <a href="#">warunki i zasady</a> *</label>
-            </div>
+                <!-- PODSUMOWANIE KOŃCOWE -->
+                <div class="summary-row summary-total">
+                    <span>Razem do zapłaty:</span>
+                    <span id="sum-grandtotal">0,00 zł</span>
+                </div>
 
-            <div class="row-space total-row">
-                <span>Łącznie:</span> <span id="summary-total">0,00 zł</span>
+                <button class="btn-order" onclick="submitOrder()">Kupuję i płacę</button>
             </div>
-            <button class="btn-order" onclick="sendToAdmin()">Kupuję i płacę</button>
         </div>
+
     </div>
 
-    <!-- MODAL INPOST (UPROSZCZONY) -->
+    <!-- MODAL WYBORU PACZKOMATU -->
     <div class="modal-overlay" id="paczkomatModal">
         <div class="paczkomat-modal">
             <div class="modal-header">
-                <span>Wyszukaj Paczkomat</span>
+                <span>Wybierz swój Paczkomat</span>
                 <span style="cursor:pointer;" onclick="closePaczkomatModal()">✕</span>
             </div>
             <div class="modal-body">
-                <p>Kliknij punkt, aby wybrać:</p>
-                <button onclick="selectPoint('WAW12M')" style="width:100%; padding:10px; margin-bottom:10px; cursor:pointer;">Warszawa - Śródmieście (WAW12M)</button>
-                <button onclick="selectPoint('KRA99B')" style="width:100%; padding:10px; cursor:pointer;">Kraków - Centrum (KRA99B)</button>
+                <button class="paczkomat-btn" onclick="selectPoint('WAW11A', 'Warszawa, Al. Jerozolimskie 45')"><b>WAW11A</b> - Warszawa, Al. Jerozolimskie 45</button>
+                <button class="paczkomat-btn" onclick="selectPoint('KRA99B', 'Kraków, Floriańska 12')"><b>KRA99B</b> - Kraków, Floriańska 12</button>
+                <button class="paczkomat-btn" onclick="selectPoint('GDA02C', 'Gdańsk, Grunwaldzka 102')"><b>GDA02C</b> - Gdańsk, Grunwaldzka 102</button>
+                <button class="paczkomat-btn" onclick="selectPoint('POZ55D', 'Poznań, Półwiejska 3')"><b>POZ55D</b> - Poznań, Półwiejska 3</button>
+                <button class="paczkomat-btn" onclick="selectPoint('WRO44E', 'Wrocław, Rynek 15')"><b>WRO44E</b> - Wrocław, Rynek 15</button>
+                <button class="paczkomat-btn" onclick="selectPoint('KAT08F', 'Katowice, Mariacka 2')"><b>KAT08F</b> - Katowice, Mariacka 2</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL SUKCESU Z INSTRUKCJĄ WPŁATY -->
+    <!-- MODAL POTWIERDZENIA (BLIK) -->
     <div class="modal-overlay" id="successModal">
         <div class="success-modal">
-            <h2>Dziękujemy za zamówienie! 🎉</h2>
-            <p>Abyśmy mogli wysłać Twoją paczkę, wykonaj teraz szybki przelew BLIK na telefon:</p>
-            
+            <h2 style="color:#2f9e44; border:none; margin:0;">Dziękujemy! 🎉</h2>
+            <p style="font-size:14px; margin-top:5px;">Twoje zamówienie zostało zarejestrowane. Wyślij teraz błyskawiczny przelew BLIK:</p>
             <div class="blik-details">
-                📱 <strong>Telefon BLIK:</strong> <span style="font-size:16px; color:#e32b7a; font-weight:bold;">555-123-456</span><br> <!-- !!! TUTAJ WPISZ SWÓJ NUMER !!! -->
-                👤 <strong>Odbiorca:</strong> Jan Kowalski<br>
-                💰 <strong>Kwota do zapłaty:</strong> <span id="modal-pay-amount" style="font-weight:bold;">0,00 zł</span><br>
+                📱 <strong>Telefon BLIK:</strong> <span style="font-size:16px; color:#e32b7a; font-weight:bold;">555-123-456</span><br>
+                👤 <strong>Odbiorca:</strong> Blue Kiwi<br>
+                💰 <strong>Kwota:</strong> <span id="modal-pay-amount" style="font-weight:bold;">0,00 zł</span><br>
                 ✏️ <strong>Tytuł przelewu:</strong> <span id="modal-pay-title" style="background:#fff3bf; padding:2px 6px; border-radius:4px; font-weight:bold;">Zamówienie #...</span>
             </div>
-            
-            <p style="font-size:12px; color:#868e96;">Status zamówienia możesz śledzić, a my wyślemy paczkę od razu po otrzymaniu przelewu!</p>
-            <button onclick="closeSuccessModal()" style="background:#2f9e44; color:white; border:none; padding:10px 25px; border-radius:6px; cursor:pointer; font-weight:bold; width:100%;">Rozumiem</button>
+            <button onclick="closeSuccessModal()" style="background:#2563eb; color:white; border:none; padding:12px; border-radius:6px; cursor:pointer; font-weight:bold; width:100%;">Gotowe, przelew wysłany!</button>
         </div>
     </div>
 
     <script>
+        // Domyślna baza danych produktów (ze zdjęciami jak na Twoich screenach)
+        const defaultProducts = [
+            { id: 101, name: "Kaczka Minis", desc: "Urocze mikro kaczuszki.", price: 6.00, stock: 15, img: "https://i.ibb.co/Lhb4Z54/duck.jpg" },
+            { id: 102, name: "Szop Pracz", desc: "Przesłodki szop z ruchomymi elementami.", price: 26.00, stock: 8, img: "https://i.ibb.co/zXn2SgZ/raccoon.jpg" }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
         if (!localStorage.getItem('products')) {
-            localStorage.setItem('products', JSON.stringify([{ id: 0, name: "Szop Pracz", price: 26.00, stock: 3 }]));
-        }
-        let cartQty = 0;
-        let productPrice = 26.00;
-        let wybralPaczkomat = "";
-
-        function toggleMenu(open) { document.getElementById('sideMenu').classList.toggle('active', open); }
-        function openPaczkomatModal() { document.getElementById('paczkomatModal').classList.add('active'); }
-        function closePaczkomatModal() { document.getElementById('paczkomatModal').classList.remove('active'); }
-        function selectPoint(code) { wybralPaczkomat = " (" + code + ")"; alert("Wybrano paczkomat: " + code); closePaczkomatModal(); }
-
-        function selectPayment(type) {
-            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('active'));
-            document.getElementById('pay-' + type).classList.add('active');
-            document.getElementById('pay-' + type).querySelector('input[name="pay-method"]').checked = true;
+            localStorage.setItem('products', JSON.stringify(defaultProducts));
         }
 
-        function getStock() { return JSON.parse(localStorage.getItem('products'))[0].stock; }
-        function updateStockDisplay() { document.getElementById('stock-count').innerText = getStock(); }
-        function changeQty(val) {
-            let cur = parseInt(document.getElementById('prod-qty').value);
-            if (cur + val >= 1 && cur + val <= getStock()) document.getElementById('prod-qty').value = cur + val;
+        let cart = {}; // { id_produktu: ilosc }
+        let selectedShippingCost = 12.99;
+        let selectedShippingName = "InPost Paczkomat 24/7";
+        let chosenPaczkomat = "";
+        let appliedDiscount = 0; // w złotówkach
+
+        // RENDERING PRODUKTÓW W SKLEPIE
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = "";
+            products.forEach(p => {
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.img}" alt="${p.name}">
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-desc">${p.desc}</div>
+                        <div class="product-price">${p.price.toFixed(2)} zł</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px; text-align:left;">Dostępne: ${p.stock} szt.</div>
+                        <div style="text-align:left;">
+                            <div class="qty-picker">
+                                <button onclick="changeQty(${p.id}, -1)">-</button>
+                                <input type="text" id="qty-${p.id}" value="1" readonly>
+                                <button onclick="changeQty(${p.id}, 1)">+</button>
+                            </div>
+                            <button class="btn-add-to-cart" onclick="addToCart(${p.id})">Dodaj</button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        function addToCart() {
-            let qty = parseInt(document.getElementById('prod-qty').value);
-            let prod = JSON.parse(localStorage.getItem('products'));
-            if (qty <= prod[0].stock) {
-                cartQty += qty;
-                prod[0].stock -= qty;
-                localStorage.setItem('products', JSON.stringify(prod));
-                document.getElementById('prod-qty').value = 1;
-                updateStockDisplay();
-                updateCartUI();
+        function changeQty(id, delta) {
+            const inp = document.getElementById(`qty-${id}`);
+            let val = parseInt(inp.value) + delta;
+            let product = products.find(p => p.id === id);
+            if (val >= 1 && val <= product.stock) {
+                inp.value = val;
             }
         }
 
+        function addToCart(id) {
+            const inp = document.getElementById(`qty-${id}`);
+            let qty = parseInt(inp.value);
+            let product = products.find(p => p.id === id);
+
+            if (product.stock >= qty) {
+                cart[id] = (cart[id] || 0) + qty;
+                product.stock -= qty;
+                localStorage.setItem('products', JSON.stringify(products));
+                inp.value = 1;
+                updateCartUI();
+                renderProducts();
+            } else {
+                alert("Brak wystarczającej ilości sztuk!");
+            }
+        }
+
+        // WYŚWIETLANIE KOSZYKA (Z miniaturkami i plus/minus)
         function updateCartUI() {
-            let sub = cartQty * productPrice;
-            document.getElementById('cart-count').innerText = cartQty;
-            document.getElementById('header-price').innerText = sub.toFixed(2) + " zł";
-            document.getElementById('summary-subtotal').innerText = sub.toFixed(2) + " zł";
-            calculateTotal();
-        }
+            const list = document.getElementById('checkout-items-list');
+            list.innerHTML = "";
+            let totalItems = 0;
+            let subtotal = 0;
 
-        function calculateTotal() {
-            let sub = cartQty * productPrice;
-            let ship = parseFloat(document.querySelector('input[name="shipping"]:checked').value);
-            document.getElementById('summary-total').innerText = sub > 0 ? (sub + ship).toFixed(2) + " zł" : "0,00 zł";
-        }
+            for (let id in cart) {
+                let p = products.find(prod => prod.id == id);
+                let qty = cart[id];
+                let itemTotal = p.price * qty;
+                totalItems += qty;
+                subtotal += itemTotal;
 
-        // LOGIKA DLA ADMINA I WYŚWIETLANIE OKIENKA Z INSTRUKCJĄ WPŁATY
-        function sendToAdmin() {
-            if (cartQty === 0) return alert("Twój koszyk jest pusty!");
-            if (!document.getElementById('terms-check').checked) return alert("Musisz zaakceptować regulamin!");
+                list.innerHTML += `
+                    <div class="checkout-item">
+                        <img src="${p.img}" alt="${p.name}">
+                        <div class="checkout-item-info">
+                            <span class="checkout-item-title">${p.name}</span>
+                            <div class="checkout-item-qty-control">
+                                <button onclick="changeCartQty(${id}, -1)">-</button>
+                                <input type="text" value="${qty}" readonly>
+                                <button onclick="changeCartQty(${id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <span class="checkout-item-price">${itemTotal.toFixed(2)} zł</span>
+                    </div>
+                `;
+            }
 
-            let shippingMethod = document.querySelector('input[name="shipping"]:checked').parentNode.innerText.split(':')[0].trim();
-            if (shippingMethod.includes("Paczkomat")) { shippingMethod += wybralPaczkomat; }
+            if (totalItems === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8; font-size:14px;">Koszyk jest pusty.</div>`;
+            }
+
+            document.getElementById('cart-count').innerText = totalItems;
+            document.getElementById('header-price').innerText = subtotal.toFixed(2) + " zł";
+            document.getElementById('sum-subtotal').innerText = subtotal.toFixed(2) + " zł";
             
-            let paymentType = document.querySelector('input[name="pay-method"]:checked').value;
-            let finalAmount = document.getElementById('summary-total').innerText;
+            recalcTotal(subtotal);
+        }
+
+        function changeCartQty(id, delta) {
+            let p = products.find(prod => prod.id == id);
+            if (delta === -1) {
+                cart[id]--;
+                p.stock++;
+                if (cart[id] <= 0) delete cart[id];
+            } else {
+                if (p.stock > 0) {
+                    cart[id]++;
+                    p.stock--;
+                } else {
+                    alert("Brak większej ilości na magazynie!");
+                }
+            }
+            localStorage.setItem('products', JSON.stringify(products));
+            updateCartUI();
+            renderProducts();
+        }
+
+        // OBSŁUGA WYSYŁKI
+        function selectShipping(type, cost) {
+            selectedShippingCost = cost;
+            document.querySelectorAll('.shipping-row').forEach(el => el.classList.remove('active'));
+            
+            if (type === 'paczkomat') {
+                selectedShippingName = "InPost Paczkomat 24/7";
+                document.getElementById('ship-paczkomat').checked = true;
+                document.getElementById('ship-paczkomat').closest('.shipping-row').classList.add('active');
+            } else if (type === 'kurier') {
+                selectedShippingName = "InPost Kurier Standard";
+                document.getElementById('ship-kurier').checked = true;
+                document.getElementById('ship-kurier').closest('.shipping-row').classList.add('active');
+            } else if (type === 'orlen') {
+                selectedShippingName = "Orlen Paczka";
+                document.getElementById('ship-orlen').checked = true;
+                document.getElementById('ship-orlen').closest('.shipping-row').classList.add('active');
+            } else if (type === 'dpd') {
+                selectedShippingName = "Punkt DPD Pickup";
+                document.getElementById('ship-dpd').checked = true;
+                document.getElementById('ship-dpd').closest('.shipping-row').classList.add('active');
+            }
+            updateCartUI();
+        }
+
+        function openPaczkomatModal(event) {
+            event.stopPropagation(); // nie odpala kliknięcia w cały wiersz
+            document.getElementById('paczkomatModal').classList.add('active');
+        }
+        function closePaczkomatModal() {
+            document.getElementById('paczkomatModal').classList.remove('active');
+        }
+        function selectPoint(code, address) {
+            chosenPaczkomat = `${code} - ${address}`;
+            document.getElementById('paczkomat-name-display').innerText = `Wybrany: ${code}`;
+            document.getElementById('paczkomat-name-display').style.color = "#22c55e";
+            closePaczkomatModal();
+        }
+
+        // KUPON RABATOWY
+        function toggleCouponInput() {
+            const grp = document.getElementById('coupon-group');
+            grp.classList.toggle('active');
+        }
+        function applyCoupon() {
+            const code = document.getElementById('coupon-code').value.toUpperCase().trim();
+            if (code === "KIWI10") {
+                appliedDiscount = 10.00; // 10 zł zniżki
+                alert("Zastosowano kupon rabatowy: -10,00 zł!");
+            } else {
+                alert("Nieprawidłowy kod kuponu.");
+                appliedDiscount = 0;
+            }
+            updateCartUI();
+        }
+
+        // PRZELICZANIE KOŃCOWEJ KWOTY
+        function recalcTotal(subtotal) {
+            let total = subtotal + selectedShippingCost - appliedDiscount;
+            if (total < 0) total = 0;
+
+            if (appliedDiscount > 0) {
+                document.getElementById('coupon-discount-row').style.display = 'flex';
+                document.getElementById('sum-discount').innerText = `-${appliedDiscount.toFixed(2)} zł`;
+            } else {
+                document.getElementById('coupon-discount-row').style.display = 'none';
+            }
+
+            document.getElementById('sum-grandtotal').innerText = total.toFixed(2) + " zł";
+        }
+
+        // SKŁADANIE ZAMÓWIENIA
+        function submitOrder() {
+            if (Object.keys(cart).length === 0) return alert("Twój koszyk jest pusty!");
+
+            // Pobieranie danych wysyłkowych
+            let fname = document.getElementById('cust-firstname').value.trim();
+            let lname = document.getElementById('cust-lastname').value.trim();
+            let street = document.getElementById('cust-street').value.trim();
+            let zip = document.getElementById('cust-zip').value.trim();
+            let city = document.getElementById('cust-city').value.trim();
+            let phone = document.getElementById('cust-phone').value.trim();
+            let email = document.getElementById('cust-email').value.trim();
+            let company = document.getElementById('cust-company').value.trim();
+            let notes = document.getElementById('cust-notes').value.trim();
+
+            if (!fname || !lname || !street || !zip || !city || !phone || !email) {
+                return alert("Wypełnij wszystkie wymagane pola oznaczone gwiazdką (*)");
+            }
+
+            if (selectedShippingName.includes("Paczkomat") && !chosenPaczkomat) {
+                return alert("Proszę wybrać paczkomat docelowy!");
+            }
+
+            let fullShippingDetails = selectedShippingName;
+            if (selectedShippingName.includes("Paczkomat")) {
+                fullShippingDetails += ` (${chosenPaczkomat})`;
+            }
+
+            // Paczka danych dla Admina
             let orderId = Math.floor(10000 + Math.random() * 90000);
+            let orderItems = [];
+            for (let id in cart) {
+                let p = products.find(prod => prod.id == id);
+                orderItems.push({
+                    name: p.name,
+                    qty: cart[id],
+                    priceEach: p.price
+                });
+            }
 
-            // Zapisz zamówienie u Admina
             let allOrders = JSON.parse(localStorage.getItem('allOrders')) || [];
-            let order = { 
-                id: orderId, 
-                shipping: shippingMethod,
-                payment: paymentType + " (Czeka na wpłatę)", 
-                qty: cartQty, 
-                total: finalAmount,
-                status: "Oczekuje na BLIK" 
-            };
-            
-            allOrders.push(order);
+            allOrders.push({
+                id: orderId,
+                customer: {
+                    name: `${fname} ${lname}`,
+                    company: company,
+                    address: `${street}, ${zip} ${city}`,
+                    phone: phone,
+                    email: email,
+                    notes: notes
+                },
+                shipping: fullShippingDetails,
+                items: orderItems,
+                total: document.getElementById('sum-grandtotal').innerText,
+                status: "Oczekuje na BLIK",
+                date: new Date().toLocaleString()
+            });
+
             localStorage.setItem('allOrders', JSON.stringify(allOrders));
 
-            // Pokaż ładne okienko z instrukcją wpłaty dla klienta
-            document.getElementById('modal-pay-amount').innerText = finalAmount;
+            // Pokazanie modal BLIK
+            document.getElementById('modal-pay-amount').innerText = document.getElementById('sum-grandtotal').innerText;
             document.getElementById('modal-pay-title').innerText = "Zamówienie #" + orderId;
             document.getElementById('successModal').classList.add('active');
         }
 
         function closeSuccessModal() {
             document.getElementById('successModal').classList.remove('active');
-            // Zresetuj koszyk dopiero po zamknięciu okna
-            cartQty = 0;
-            wybralPaczkomat = "";
-            document.getElementById('terms-check').checked = false;
+            // Wyczyszczenie koszyka i reset formularzy
+            cart = {};
+            chosenPaczkomat = "";
+            appliedDiscount = 0;
+            document.getElementById('paczkomat-name-display').innerText = "Wybierz punkt Paczkomat!";
+            document.getElementById('paczkomat-name-display').style.color = "#ef4444";
+            document.getElementById('cust-firstname').value = "";
+            document.getElementById('cust-lastname').value = "";
+            document.getElementById('cust-street').value = "";
+            document.getElementById('cust-zip').value = "";
+            document.getElementById('cust-city').value = "";
+            document.getElementById('cust-phone').value = "";
+            document.getElementById('cust-email').value = "";
+            document.getElementById('cust-company').value = "";
+            document.getElementById('cust-notes').value = "";
             updateCartUI();
+            renderProducts();
         }
 
-        updateStockDisplay();
+        window.addEventListener('storage', () => {
+            products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+            renderProducts();
+            updateCartUI();
+        });
+
+        renderProducts();
+        updateCartUI();
     </script>
 </body>
 </html>
