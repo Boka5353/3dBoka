@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administratora - Blue Kiwi</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e2d42;
+            --border: #e2e8f0;
+            --primary: #2b9ee3;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 30px 15px; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .box { background: var(--card-bg); padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        h2 { margin-top: 0; font-size: 24px; border-bottom: 2px solid var(--border); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .refresh-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 14px; border-bottom: 1px solid var(--border); text-align: left; font-size: 14px; }
+        th { background: #f1f5f9; font-weight: 600; }
+        tr:hover { background-color: #f8fafc; }
+        
+        /* Kolorowe statusy płatności i zamówień */
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-align: center; cursor: pointer; border: none; }
+        .status-waiting { background: #fff3bf; color: #e67e22; } /* Oczekuje na BLIK */
+        .status-paid { background: #d3f9d8; color: #2b8a3e; }    /* Opłacone / Do spakowania */
+        .status-sent { background: #e7f5ff; color: #1c7ed6; }    /* Wysłane */
+        
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="box">
+            <h2>
+                <span>📦 Panel Zamówień Blue Kiwi</span>
+                <button class="refresh-btn" onclick="loadOrders()">🔄 Odśwież listę</button>
+            </h2>
+            
+            <div id="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Zamówienia</th>
+                            <th>Ilość sztuk</th>
+                            <th>Wysyłka</th>
+                            <th>Metoda Płatności</th>
+                            <th>Wartość</th>
+                            <th>Status (Kliknij, aby zmienić)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-list">
+                        <!-- Tutaj wpadną zamówienia -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="no-orders" class="empty-state" style="display: none;">
+                Brak zamówień w bazie danych. Spróbuj coś kupić w sklepie!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadOrders() {
+            let orders = JSON.parse(localStorage.getItem('allOrders')) || [];
+            let tbody = document.getElementById('orders-list');
+            let emptyState = document.getElementById('no-orders');
+            let tableWrapper = document.getElementById('table-wrapper');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = "";
+                tableWrapper.style.display = "none";
+                emptyState.style.display = "block";
+                return;
+            }
+            
+            tableWrapper.style.display = "block";
+            emptyState.style.display = "none";
+            
+            let html = "";
+            // Wyświetlamy zamówienia od najnowszego na górze
+            orders.slice().reverse().forEach((order, reverseIndex) => {
+                // Obliczamy prawdziwy indeks w oryginalnej tablicy
+                let originalIndex = orders.length - 1 - reverseIndex;
+                
+                // Przypisanie odpowiedniej klasy CSS do statusu
+                let statusClass = "status-waiting";
+                if (order.status === "Opłacone (Szykuj paczkę)") statusClass = "status-paid";
+                if (order.status === "Wysłane") statusClass = "status-sent";
+
+                html += `
+                <tr>
+                    <td><strong>#${order.id}</strong></td>
+                    <td>${order.qty} szt.</td>
+                    <td>${order.shipping}</td>
+                    <td><span style="color:#e32b7a; font-weight:bold;">${order.payment}</span></td>
+                    <td><strong>${order.total}</strong></td>
+                    <td>
+                        <button class="status-badge ${statusClass}" onclick="cycleStatus(${originalIndex})">
+                            ${order.status}
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // Funkcja pozwalająca przełączać statusy zamówienia po kliknięciu
+        function cycleStatus(index) {
+            let orders = JSON.parse(localStorage.getItem('allOrders'));
+            let currentStatus = orders[index].status;
+            
+            if (currentStatus === "Oczekuje na BLIK") {
+                // Klikasz, bo sprawdziłeś telefon i przelew BLIK od klienta dotarł
+                orders[index].status = "Opłacone (Szykuj paczkę)";
+            } else if (currentStatus === "Opłacone (Szykuj paczkę)") {
+                // Klikasz, gdy nadasz paczkę w paczkomacie / u kuriera
+                orders[index].status = "Wysłane";
+            } else {
+                // Powrót do początku w razie pomyłki
+                orders[index].status = "Oczekuje na BLIK";
+            }
+            
+            localStorage.setItem('allOrders', JSON.stringify(orders));
+            loadOrders();
+        }
+
+        // Automatyczne odświeżanie, gdy klient dokona zakupu w innej karcie
+        window.addEventListener('storage', loadOrders);
+        
+        // Pierwsze załadowanie
+        loadOrders();
+    </script>
+</body>
+</html>
